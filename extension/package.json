@@ -16,7 +16,8 @@
   "categories": ["Visualization", "Other"],
   "keywords": ["llm", "agent", "claude", "ai", "visualization", "orchestration"],
   "activationEvents": [
-    "onWebviewPanel:agentVisualizer"
+    "onWebviewPanel:agentVisualizer",
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {

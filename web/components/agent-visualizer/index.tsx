@@ -86,6 +86,17 @@ export function AgentVisualizer() {
     return () => clearTimeout(timer)
   }, [play])
 
+  // Show diagnostic message when VS Code bridge is connected but no sessions detected
+  const [showNoSessions, setShowNoSessions] = useState(false)
+  useEffect(() => {
+    if (!bridge.isVSCode || bridge.sessions.length > 0) {
+      setShowNoSessions(false)
+      return
+    }
+    const timer = setTimeout(() => setShowNoSessions(true), 5000)
+    return () => clearTimeout(timer)
+  }, [bridge.isVSCode, bridge.sessions.length])
+
   // Per-session state cache: save/restore simulation state on tab switch
   // so sessions stay up to date and switching is instant.
   // useLayoutEffect ensures restart happens synchronously before any animation
@@ -267,6 +278,16 @@ export function AgentVisualizer() {
         selectedDiscoveryId={selection.selectedDiscoveryId}
         showCostOverlay={showCostOverlay}
       />
+
+      {/* No-session diagnostic overlay */}
+      {showNoSessions && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 10 }}>
+          <div className="text-center" style={{ color: COLORS.textMuted }}>
+            <div className="text-sm font-mono mb-2" style={{ color: COLORS.textDim }}>No active Claude Code sessions detected</div>
+            <div className="text-[10px] font-mono">Watching for sessions in this workspace...</div>
+          </div>
+        </div>
+      )}
 
       {/* Message feed panel (top-left) */}
       <MessageFeedPanel

@@ -63,6 +63,14 @@ export async function activate(context: vscode.ExtensionContext) {
       ensureHookScript()
       writeDiscoveryFile(hookPort, workspace)
       migrateHttpHooks()
+
+      // Re-create discovery file periodically if it's been removed (e.g. by
+      // another instance's cleanup or a crash). Without it, hook.js silently
+      // exits and no events reach the extension.
+      const discoveryHealthCheck = setInterval(() => {
+        writeDiscoveryFile(hookPort, workspace)
+      }, 30_000)
+      context.subscriptions.push({ dispose: () => clearInterval(discoveryHealthCheck) })
     }
 
     // Wire hook events to the webview — but only when session watcher isn't active
